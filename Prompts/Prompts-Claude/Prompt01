@@ -1,0 +1,662 @@
+Quero que você desenvolva um notebook completo para Google Colab, preferencialmente em Python, para realizar a coleta e organização dos arquivos/anexos associados a um banco de dados de publicações utilizado em uma pesquisa acadêmica.
+
+## 1. Contexto da pesquisa
+
+Estou realizando uma pesquisa sobre a **disputa de enquadramentos durante a greve estudantil de 2023 na Universidade de São Paulo (USP)**.
+
+Tenho um banco de dados contendo unidades de análise provenientes de diferentes fontes institucionais e de redes sociais. Entre elas:
+
+* publicações no Instagram;
+* Reels do Instagram;
+* posts do Instagram com legendas;
+* publicações do Jornal da USP;
+* publicações de outros veículos institucionais da Reitoria;
+* páginas e publicações em sites institucionais de Institutos da USP;
+* eventualmente documentos, imagens, PDFs, vídeos ou outros arquivos vinculados às páginas institucionais.
+
+As **legendas das publicações do Instagram são importantes para a análise dos enquadramentos**, portanto não quero que o processo de coleta se limite aos arquivos multimídia. Sempre que tecnicamente possível, a legenda/texto associado à publicação também deve ser preservado.
+
+O objetivo principal é transformar uma planilha com URLs em uma estrutura organizada de arquivos, na qual cada unidade de análise tenha seus respectivos anexos e metadados preservados.
+
+---
+
+# 2. Entrada
+
+O notebook deve permitir que eu faça upload de uma planilha Excel (`.xlsx`) ou CSV contendo os registros.
+
+A planilha terá pelo menos uma coluna contendo a URL da publicação/página.
+
+Por exemplo:
+
+| ID  | Ator      | Grupo do Ator | Plataforma         | Veículo-Fonte | URL         |
+| --- | --------- | ------------- | ------------------ | ------------- | ----------- |
+| 001 | Reitoria  | Reitoria      | Instagram          | Jornal da USP | https://... |
+| 002 | Reitoria  | Reitoria      | Instagram          | Jornal da USP | https://... |
+| 003 | Instituto | Instituto     | Site institucional | Instituto X   | https://... |
+| 004 | Instituto | Instituto     | Site institucional | Instituto Y   | https://... |
+
+Não presuma que os nomes das colunas serão exatamente esses. O notebook deve permitir que eu indique qual coluna contém a URL e, idealmente, detectar automaticamente uma coluna chamada `URL`, `Link`, `Link da publicação`, `Link/URL` ou nomes semelhantes.
+
+É muito importante que o `ID` original da unidade seja preservado.
+
+Se não houver uma coluna `ID`, o notebook deve criar um identificador sequencial, por exemplo:
+
+`UA_0001`, `UA_0002`, `UA_0003` etc.
+
+---
+
+# 3. O que o notebook deve fazer
+
+Para cada URL da planilha:
+
+### 3.1 Acessar a página
+
+Tentar acessar a URL fornecida e identificar o conteúdo público disponível.
+
+As fontes podem ser:
+
+* Instagram;
+* Jornal da USP;
+* sites institucionais da USP;
+* páginas institucionais;
+* páginas que contenham PDFs;
+* páginas que contenham imagens;
+* páginas que contenham vídeos;
+* outros formatos de publicação institucional.
+
+O código deve identificar o tipo de URL quando possível.
+
+---
+
+# 4. Instagram
+
+Para URLs do Instagram, quero que o código tente preservar, quando tecnicamente possível e permitido:
+
+* imagens;
+* vídeos;
+* imagens de carrosséis;
+* vídeo de Reels;
+* thumbnail/capa, quando disponível;
+* legenda da publicação;
+* data da publicação, quando disponível;
+* nome do perfil;
+* URL original.
+
+ATENÇÃO:
+
+Não quero que o código tente:
+
+* burlar login;
+* contornar CAPTCHA;
+* contornar mecanismos de segurança;
+* quebrar bloqueios;
+* utilizar credenciais de terceiros;
+* utilizar técnicas de scraping proibidas;
+* simular comportamento malicioso.
+
+Se o conteúdo do Instagram não puder ser baixado publicamente por um método legítimo, o notebook deve registrar a falha na planilha de controle e seguir para a próxima URL.
+
+Não quero que o notebook simplesmente pare porque uma URL do Instagram falhou.
+
+---
+
+# 5. Sites institucionais
+
+Para páginas institucionais da USP, Jornal da USP e sites de Institutos, quero que o notebook procure os arquivos e conteúdos associados à página.
+
+Quando disponíveis publicamente, deve tentar salvar:
+
+* imagens;
+* PDFs;
+* documentos;
+* vídeos;
+* arquivos multimídia;
+* imagens utilizadas na publicação;
+* outros arquivos diretamente vinculados à página.
+
+Além disso, deve preservar o **texto da página**, pois o texto institucional também é parte importante do corpus.
+
+Quando possível, salvar o texto em um arquivo `.txt` associado à unidade de análise.
+
+Por exemplo:
+
+`UA_0003/texto_publicacao.txt`
+
+---
+
+# 6. Estrutura das pastas
+
+Quero que o notebook gere uma pasta principal chamada:
+
+`COLETA_ANEXOS_USP_GREVE_2023`
+
+Dentro dela, quero uma pasta para cada unidade de análise:
+
+```text
+COLETA_ANEXOS_USP_GREVE_2023/
+│
+├── UA_0001/
+│   ├── original/
+│   ├── imagens/
+│   ├── videos/
+│   ├── documentos/
+│   ├── texto/
+│   └── metadados.json
+│
+├── UA_0002/
+│   ├── original/
+│   ├── imagens/
+│   ├── videos/
+│   ├── documentos/
+│   ├── texto/
+│   └── metadados.json
+│
+├── UA_0003/
+│   ├── original/
+│   ├── imagens/
+│   ├── videos/
+│   ├── documentos/
+│   ├── texto/
+│   └── metadados.json
+│
+└── ...
+```
+
+Se houver um carrossel do Instagram com cinco imagens, por exemplo:
+
+```text
+UA_0001/
+└── imagens/
+    ├── imagem_01.jpg
+    ├── imagem_02.jpg
+    ├── imagem_03.jpg
+    ├── imagem_04.jpg
+    └── imagem_05.jpg
+```
+
+Se houver vídeo:
+
+```text
+UA_0001/
+└── videos/
+    └── video_01.mp4
+```
+
+Se houver PDF:
+
+```text
+UA_0003/
+└── documentos/
+    └── documento_01.pdf
+```
+
+---
+
+# 7. Preservação da legenda e do texto
+
+Esta parte é MUITO importante.
+
+Para cada unidade, quando o texto estiver disponível publicamente, quero salvar um arquivo:
+
+`texto/texto_publicacao.txt`
+
+Esse arquivo deve conter:
+
+* legenda do Instagram, quando for Instagram;
+* texto da publicação institucional, quando for site institucional;
+* título da publicação, quando disponível;
+* corpo do texto;
+* eventualmente subtítulos ou informações textuais relevantes.
+
+Não faça uma limpeza linguística.
+
+Não remova:
+
+* acentos;
+* cedilha;
+* pontuação;
+* hashtags;
+* menções;
+* quebras de parágrafo relevantes.
+
+O texto deve ser preservado exatamente igual a fonte original.
+
+Se houver hashtags, preserve-as.
+
+Exemplo:
+
+```text
+Título: Estudantes da USP entram em greve...
+
+Legenda:
+Os estudantes da Universidade de São Paulo...
+#USP #GreveUSP #Permanência
+```
+
+---
+
+# 8. Metadados
+
+Para cada unidade, criar:
+
+`metadados.json`
+
+Contendo, quando disponível:
+
+```json
+{
+    "id_unidade": "UA_0001",
+    "url_original": "...",
+    "tipo_fonte": "Instagram",
+    "perfil_ou_veiculo": "...",
+    "data_coleta": "...",
+    "data_publicacao": "...",
+    "titulo": "...",
+    "legenda_disponivel": true,
+    "numero_arquivos": 3,
+    "arquivos": [
+        "imagens/imagem_01.jpg",
+        "imagens/imagem_02.jpg",
+        "videos/video_01.mp4"
+    ],
+    "status": "sucesso"
+}
+```
+
+Não invente metadados que não estejam disponíveis.
+
+Quando uma informação não puder ser obtida, utilize `null` ou `"não disponível"`.
+
+---
+
+# 9. Planilha final de controle
+
+Esta é uma parte essencial.
+
+Ao terminar a coleta, o notebook deve gerar uma nova planilha:
+
+`relatorio_coleta.xlsx`
+
+Ela deve conter uma linha para cada URL original.
+
+Sugestão de colunas:
+
+* `ID_original`
+* `URL`
+* `tipo_fonte`
+* `status`
+* `data_coleta`
+* `arquivos_baixados`
+* `imagens_baixadas`
+* `videos_baixados`
+* `documentos_baixados`
+* `texto_baixado`
+* `legenda_baixada`
+* `pasta`
+* `mensagem_erro`
+
+Exemplos de status:
+
+* `SUCESSO`
+* `SUCESSO_COM_RESTRICOES`
+* `SEM_ARQUIVOS`
+* `ERRO_DE_ACESSO`
+* `URL_INVALIDA`
+* `CONTEUDO_NAO_DISPONIVEL`
+* `NAO_SUPORTADO`
+
+O processo deve continuar mesmo quando determinada URL apresentar erro.
+
+---
+
+# 10. Registro detalhado dos erros
+
+Não quero perder informação sobre URLs que não puderam ser coletadas.
+
+Para cada falha, registrar:
+
+* URL;
+* ID;
+* horário da tentativa;
+* tipo de erro;
+* mensagem técnica resumida;
+* possível motivo;
+* se a URL pode ser tentada novamente.
+
+Criar também:
+
+`erros_coleta.csv`
+
+---
+
+# 11. Evitar duplicação
+
+Pode haver URLs repetidas na planilha.
+
+O notebook deve detectar URLs duplicadas.
+
+Não quero baixar o mesmo conteúdo várias vezes.
+
+Porém, não elimine silenciosamente os registros duplicados da planilha original.
+
+Mantenha a relação entre os IDs originais e o arquivo coletado.
+
+Por exemplo:
+
+```text
+UA_0012 → URL X
+UA_0047 → URL X
+```
+
+Nesse caso, o conteúdo pode ser baixado apenas uma vez, mas o relatório deve registrar que os dois IDs apontam para a mesma URL.
+
+---
+
+# 12. Nomes dos arquivos
+
+Os nomes dos arquivos precisam ser seguros para Windows/Linux/Google Drive.
+
+Evitar caracteres como:
+
+`/ \ : * ? " < > |`
+
+Se houver um título ou nome muito grande, truncar o nome.
+
+Nunca sobrescrever silenciosamente um arquivo já existente.
+
+---
+
+# 13. Google Drive
+
+Quero que o notebook possa salvar o resultado diretamente no meu Google Drive.
+
+No início do notebook, deve haver uma célula para:
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+```
+
+E depois permitir escolher uma pasta de destino.
+
+Por exemplo:
+
+```text
+/content/drive/MyDrive/COLETA_ANEXOS_USP_GREVE_2023/
+```
+
+Também quero uma alternativa para salvar temporariamente no ambiente do Colab e depois gerar um `.zip`.
+
+---
+
+# 14. ZIP final
+
+Ao terminar, o notebook deve permitir compactar toda a coleta em:
+
+`COLETA_ANEXOS_USP_GREVE_2023.zip`
+
+Não é necessário criar o ZIP se eu escolher salvar diretamente no Google Drive, mas essa opção deve existir.
+
+---
+
+# 15. Segurança e limites
+
+O código deve ser ético e tecnicamente conservador.
+
+Não quero técnicas destinadas a contornar:
+
+* autenticação;
+* CAPTCHA;
+* paywall;
+* bloqueios de acesso;
+* sistemas anti-bot;
+* restrições de acesso;
+* mecanismos de segurança.
+
+Se determinada página não puder ser acessada, registrar o problema e continuar.
+
+Não utilizar credenciais pessoais ou pedir minha senha.
+
+---
+
+# 16. Robustez
+
+O notebook precisa ser capaz de lidar com uma planilha relativamente grande.
+
+Por isso:
+
+* mostrar barra de progresso;
+* mostrar qual URL está sendo processada;
+* não interromper toda a execução por causa de uma URL problemática;
+* salvar o progresso periodicamente;
+* permitir retomar uma coleta interrompida;
+* não baixar novamente arquivos que já existem;
+* utilizar timeout para páginas que não respondem;
+* registrar erros individualmente.
+
+Se possível, implementar uma opção:
+
+`RETOMAR_COLETA = True`
+
+Quando `True`, o notebook deve verificar o `relatorio_coleta.xlsx` existente e continuar apenas as unidades que ainda não foram concluídas.
+
+---
+
+# 17. Importante: não destruir meu banco original
+
+O notebook NUNCA deve alterar a planilha original.
+
+Ele deve trabalhar com uma cópia ou somente leitura.
+
+O arquivo original deve permanecer intacto.
+
+---
+
+# 18. Organização do notebook
+
+Quero que você entregue o código como um notebook adequado para um usuário que não é programador avançado.
+
+Organize as células nesta ordem:
+
+### Célula 1
+
+Título e explicação do objetivo.
+
+### Célula 2
+
+Instalação/importação das bibliotecas.
+
+### Célula 3
+
+Configurações gerais.
+
+### Célula 4
+
+Upload da planilha.
+
+### Célula 5
+
+Seleção da coluna de URL.
+
+### Célula 6
+
+Montagem do Google Drive.
+
+### Célula 7
+
+Criação da estrutura de pastas.
+
+### Célula 8
+
+Funções de identificação das fontes.
+
+### Célula 9
+
+Funções de coleta.
+
+### Célula 10
+
+Funções de extração de texto.
+
+### Célula 11
+
+Funções de download de imagens/vídeos/documentos.
+
+### Célula 12
+
+Processamento das URLs.
+
+### Célula 13
+
+Relatório de progresso.
+
+### Célula 14
+
+Geração do relatório final.
+
+### Célula 15
+
+Geração do ZIP.
+
+### Célula 16
+
+Resumo final da coleta.
+
+---
+
+# 19. Quero que você teste o código
+
+Antes de me entregar o notebook, revise cuidadosamente o código procurando:
+
+* erros de sintaxe;
+* bibliotecas incompatíveis com Google Colab;
+* funções depreciadas;
+* problemas com encoding UTF-8;
+* problemas com acentos e caracteres portugueses;
+* problemas com nomes de arquivos;
+* problemas com URLs;
+* problemas de timeout;
+* problemas de arquivos duplicados;
+* problemas de retomada;
+* problemas de permissões no Google Drive.
+
+É especialmente importante garantir que textos em português contendo:
+
+`á é í ó ú â ê ô ã õ ç`
+
+sejam preservados corretamente.
+
+---
+
+# 20. Quero que você seja explícito sobre as limitações do Instagram
+
+Não apresente como garantido que será possível baixar qualquer Reel ou publicação do Instagram.
+
+Explique no próprio notebook que a coleta depende da disponibilidade pública do conteúdo e das limitações técnicas e de acesso da plataforma.
+
+Se uma URL do Instagram não puder ser coletada automaticamente, o relatório deve registrar isso claramente.
+
+---
+
+# 21. Resultado esperado
+
+No final, quero ter algo semelhante a:
+
+```text
+COLETA_ANEXOS_USP_GREVE_2023/
+│
+├── UA_0001/
+│   ├── imagens/
+│   │   ├── imagem_01.jpg
+│   │   └── imagem_02.jpg
+│   ├── videos/
+│   ├── documentos/
+│   ├── texto/
+│   │   └── texto_publicacao.txt
+│   └── metadados.json
+│
+├── UA_0002/
+│   ├── imagens/
+│   ├── videos/
+│   │   └── video_01.mp4
+│   ├── documentos/
+│   ├── texto/
+│   │   └── texto_publicacao.txt
+│   └── metadados.json
+│
+├── UA_0003/
+│   ├── imagens/
+│   ├── videos/
+│   ├── documentos/
+│   │   └── documento_01.pdf
+│   ├── texto/
+│   │   └── texto_publicacao.txt
+│   └── metadados.json
+│
+├── relatorio_coleta.xlsx
+├── erros_coleta.csv
+└── README.txt
+```
+
+O `README.txt` deve explicar:
+
+* data da coleta;
+* quantidade total de URLs;
+* quantidade processada;
+* quantidade com sucesso;
+* quantidade com erro;
+* quantidade de arquivos baixados;
+* limitações encontradas;
+* como retomar a coleta;
+* como localizar os arquivos de cada unidade.
+
+---
+
+# 22. Uma exigência metodológica importante
+
+Não trate o arquivo multimídia como substituto da unidade de análise.
+
+A unidade de análise continua sendo o registro original da minha planilha.
+
+Os arquivos coletados são materiais associados à unidade.
+
+Portanto, o `ID_original` precisa aparecer:
+
+* no nome da pasta;
+* no `metadados.json`;
+* no relatório final;
+* e, quando possível, nos nomes dos arquivos.
+
+Por exemplo:
+
+```text
+UA_0023/
+    imagens/
+        UA_0023_imagem_01.jpg
+    texto/
+        UA_0023_texto_publicacao.txt
+    metadados.json
+```
+
+Isso é importante para manter a rastreabilidade do corpus e permitir posteriormente a conferência manual das fontes.
+
+---
+
+# 23. Entrega
+
+Não quero apenas uma explicação conceitual.
+
+Quero que você produza:
+
+1. o código completo do notebook;
+2. todas as células necessárias;
+3. instruções claras de execução;
+4. explicação das bibliotecas utilizadas;
+5. explicação das limitações, especialmente para Instagram;
+6. uma pequena seção "Como usar" para alguém que nunca programou em Python;
+7. uma seção "O que fazer quando uma URL falhar";
+8. uma seção "Como retomar uma coleta interrompida".
+
+Se alguma parte da coleta não puder ser implementada de forma confiável ou legítima, não invente uma solução. Explique a limitação e implemente o melhor fallback possível.
+
+Priorize **rastreabilidade, preservação do conteúdo original, organização dos arquivos e reprodutibilidade da coleta**, pois o material será utilizado em uma pesquisa acadêmica.
